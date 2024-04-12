@@ -111,4 +111,13 @@ describe('Range Component', () => {
     expect(maxRangeValue).toHaveValue('60.00€');
   });
 
+  test('it should set max and min values on fixed range', () => {
+    const fixedRanges = [1.99, 5.99, 10.99, 30.99, 50.99, 70.99]
+    render(<Range fixedValues={fixedRanges} />);
+    const minRangeValue = screen.getByDisplayValue('1.99€');
+    const maxRangeValue = screen.getByDisplayValue('70.99€');
+
+    expect(minRangeValue).toHaveValue('1.99€');
+    expect(maxRangeValue).toHaveValue('70.99€');
+  });
 });
