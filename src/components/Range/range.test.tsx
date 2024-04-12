@@ -143,4 +143,27 @@ describe('Range Component', () => {
 
     expect(endInput).toHaveValue('50.99€')
   });
+
+  test('it should move start value to next smallest fixed value', () => {
+    const fixedRanges = [1.99, 5.99, 10.99, 30.99, 50.99, 70.99]
+    render(<Range fixedValues={fixedRanges} />);
+    const startInput = screen.getByDisplayValue('1.99€');
+
+    const startThumb = screen.getByTestId('start-thumb');
+    const rangeTrack = screen.getByTestId('range-track');
+
+    const rangeWidth = 300;
+    rangeTrack.getBoundingClientRect = jest.fn(() => ({
+      left: 0,
+      width: rangeWidth
+    }));
+
+    fireEvent.mouseDown(startThumb, { clientX: 0 });
+
+    const moveTo = rangeWidth * 0.05;
+    fireEvent.mouseMove(window, { clientX: moveTo });
+    fireEvent.mouseUp(window);
+
+    expect(startInput).toHaveValue('5.99€')
+  });
 });
