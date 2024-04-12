@@ -2,14 +2,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface RangeSliderProps {
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
+  fixedValues?: number[]
 }
 
-export const Range = ({ min, max }: RangeSliderProps) => {
-  const [range, setRange] = useState<{ start: number; end: number }>({ start: min, end: max });
+export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
+  const [rangeBoundary, setRangeBoundary] = useState<{ max: number; min: number }>({ max: 0, min: 0 })
+  const [range, setRange] = useState<{ start: number; end: number }>({ start: 0, end: 0 });
   const [isDragging, setIsDragging] = useState<{ start: boolean; end: boolean }>({ start: false, end: false });
   const rangeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (fixedValues) {
+      const orderedValues = fixedValues.sort((a, b) => a - b)
+      const max = Math.max(...orderedValues);
+      const min = Math.min(...orderedValues);
+
+      setRange({ start: min, end: max })
+      setRangeBoundary({ max, min })
+    } else {
+
+      setRange({ start: min ?? 0, end: max ?? 0 })
+      setRangeBoundary({ max: max ?? 0, min: min ?? 0 })
+    }
+
+  }, [])
 
   useEffect(() => {
     const moveThumb = (event: MouseEvent) => {
@@ -19,7 +37,7 @@ export const Range = ({ min, max }: RangeSliderProps) => {
       const { left, width } = rangeRef.current.getBoundingClientRect();
       const clickedPosition = Math.min(Math.max(0, clientX - left), width);
       const clickedValue = clickedPosition / width;
-      const newValue = +(min + (max - min) * clickedValue).toFixed(2);
+      const newValue = +(rangeBoundary.min + (rangeBoundary.max - rangeBoundary.min) * clickedValue).toFixed(2);
 
       if (isDragging.start) {
         if (newValue > range.end) {
@@ -53,7 +71,7 @@ export const Range = ({ min, max }: RangeSliderProps) => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, type: 'start' | 'end') => {
     const value = parseFloat(event.target.value.replace('€', '').trim());
-    if (!isNaN(value) && value >= min && value <= max) {
+    if (!isNaN(value) && value >= rangeBoundary.min && value <= rangeBoundary.max) {
       if (type === 'start' && value <= range.end) {
         setRange({ ...range, start: value });
       } else if (type === 'end' && value >= range.start) {
@@ -82,7 +100,7 @@ export const Range = ({ min, max }: RangeSliderProps) => {
         <div
           className='absolute top-1/2 h-3 w-3 cursor-grab rounded-full -translate-x-1/2 -translate-y-1/2 bg-black hover:scale-110'
           style={{
-            left: `${((range.start - min) / (max - min)) * 100}%`,
+            left: `${((range.start - rangeBoundary.min) / (rangeBoundary.max - rangeBoundary.min)) * 100}%`,
           }}
           onMouseDown={startDragging('start')}
           data-testid="start-thumb"
@@ -90,7 +108,7 @@ export const Range = ({ min, max }: RangeSliderProps) => {
         <div
           className='absolute top-1/2 h-3 w-3 cursor-grab rounded-full -translate-x-1/2 -translate-y-1/2 bg-black hover:scale-110'
           style={{
-            left: `${((range.end - min) / (max - min)) * 100}%`,
+            left: `${((range.end - rangeBoundary.min) / (rangeBoundary.max - rangeBoundary.min)) * 100}%`,
           }}
           onMouseDown={startDragging('end')}
           data-testid="end-thumb"
