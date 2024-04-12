@@ -100,6 +100,7 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
     <div className='flex gap-4 justify-center items-center '>
       <input
         type="text"
+        disabled={fixedValues ? true : false}
         className='text-right w-20 bg-transparent appearance-none border-none focus:outline-none focus:border-none focus:ring-0 text-sm'
         value={range.start.toFixed(2) + '€'}
         onChange={(e) => handleInputChange(e, 'start')}
@@ -133,6 +134,7 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
 
       <input
         type="text"
+        disabled={fixedValues ? true : false}
         className='w-20 bg-transparent appearance-none border-none focus:outline-none focus:border-none focus:ring-0 text-sm'
         value={range.end.toFixed(2) + '€'}
         onChange={(e) => handleInputChange(e, 'end')}
