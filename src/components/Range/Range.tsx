@@ -15,9 +15,8 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
 
   useEffect(() => {
     if (fixedValues) {
-      const orderedValues = fixedValues.sort((a, b) => a - b)
-      const max = Math.max(...orderedValues);
-      const min = Math.min(...orderedValues);
+      const max = Math.max(...fixedValues);
+      const min = Math.min(...fixedValues);
 
       setRange({ start: min, end: max })
       setRangeBoundary({ max, min })
@@ -36,21 +35,38 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
       const { clientX } = event;
       const { left, width } = rangeRef.current.getBoundingClientRect();
       const clickedPosition = Math.min(Math.max(0, clientX - left), width);
-      const clickedValue = clickedPosition / width;
-      const newValue = +(rangeBoundary.min + (rangeBoundary.max - rangeBoundary.min) * clickedValue).toFixed(2);
+      if (fixedValues) {
+        const sortedValues = fixedValues.sort((a, b) => a - b)
+        const clickedValue = clickedPosition / width;
+        const newValue = sortedValues.reduce((prev, curr) =>
+          Math.abs(curr - (sortedValues[0] + clickedValue * (sortedValues[sortedValues.length - 1] - sortedValues[0]))) <
+            Math.abs(prev - (sortedValues[0] + clickedValue * (sortedValues[sortedValues.length - 1] - sortedValues[0]))) ? curr : prev);
 
-      if (isDragging.start) {
-        if (newValue > range.end) {
-          setIsDragging({ ...isDragging, start: false });
-          return;
+        if (isDragging.start) {
+          if (newValue >= range.end) return;
+          setRange(prev => ({ ...prev, start: newValue }));
+        } else if (isDragging.end) {
+          if (newValue <= range.start) return;
+          setRange(prev => ({ ...prev, end: newValue }));
         }
-        setRange({ ...range, start: newValue });
-      } else if (isDragging.end) {
-        if (newValue < range.start) {
-          setIsDragging({ ...isDragging, end: false });
-          return;
+
+      } else {
+        const clickedValue = clickedPosition / width;
+        const newValue = +(rangeBoundary.min + (rangeBoundary.max - rangeBoundary.min) * clickedValue).toFixed(2);
+
+        if (isDragging.start) {
+          if (newValue > range.end) {
+            setIsDragging({ ...isDragging, start: false });
+            return;
+          }
+          setRange({ ...range, start: newValue });
+        } else if (isDragging.end) {
+          if (newValue < range.start) {
+            setIsDragging({ ...isDragging, end: false });
+            return;
+          }
+          setRange({ ...range, end: newValue });
         }
-        setRange({ ...range, end: newValue });
       }
     };
 
