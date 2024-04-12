@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import { Range } from './Range';
 
 describe('Range Component', () => {
@@ -166,4 +167,21 @@ describe('Range Component', () => {
 
     expect(startInput).toHaveValue('5.99€')
   });
+
+  test('prevents input for fixed range values', async () => {
+    const fixedRanges = [1.99, 5.99, 10.99, 30.99, 50.99, 70.99]
+    render(<Range fixedValues={fixedRanges} />);
+    const startInput = screen.getByDisplayValue('1.99€');
+    const endInput = screen.getByDisplayValue('70.99€');
+
+    await userEvent.type(startInput, '50.01€');
+    await userEvent.tab();
+
+    await userEvent.type(endInput, '50.00€');
+    await userEvent.tab();
+
+    expect(startInput).toHaveValue('1.99€');
+    expect(endInput).toHaveValue('70.99€');
+  });
+
 });
