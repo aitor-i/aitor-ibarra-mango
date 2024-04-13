@@ -47,10 +47,16 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
             Math.abs(prev - (sortedValues[0] + clickedValue * (sortedValues[sortedValues.length - 1] - sortedValues[0]))) ? curr : prev);
 
         if (isDragging.start) {
-          if (newValue >= range.end) return;
+          if (newValue >= range.end) {
+            setIsDragging({ ...isDragging, start: false });
+            return
+          }
           setRange(prev => ({ ...prev, start: newValue }));
         } else if (isDragging.end) {
-          if (newValue <= range.start) return;
+          if (newValue <= range.start) {
+            setIsDragging({ ...isDragging, end: false });
+            return
+          }
           setRange(prev => ({ ...prev, end: newValue }));
         }
 
