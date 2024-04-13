@@ -1,8 +1,3 @@
-import { Range } from "@/components/Range/Range"
 export default function page() {
-  return (
-    <div>
-      <Range max={10} min={1} />
-    </div>
-  )
+    return <div className="justify-center gap-4 flex-col flex px-4 py-32 h-screen alingn-center"></div>;
 }
