@@ -92,12 +92,14 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
     return () => {
       window.removeEventListener('mousemove', moveThumb);
       window.addEventListener('mouseup', () => {
+        if (!isDragging.end && !isDragging.start) return
         if (isDragging.start && startThumbRef.current) startThumbRef.current.style.cursor = 'grab';
         if (isDragging.end && endThumbRef.current) endThumbRef.current.style.cursor = 'grab';
         setIsDragging({ start: false, end: false })
       });
     };
-  }, [isDragging, min, max, range]);
+  }, [isDragging.start, isDragging.end, min, max, range, fixedValues]);
+
 
   const startDragging = (thumb: 'start' | 'end') => () => {
     setIsDragging({ ...isDragging, [thumb]: true });
