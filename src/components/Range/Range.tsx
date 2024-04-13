@@ -12,6 +12,8 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
   const [range, setRange] = useState<{ start: number; end: number }>({ start: 0, end: 0 });
   const [isDragging, setIsDragging] = useState<{ start: boolean; end: boolean }>({ start: false, end: false });
   const rangeRef = useRef<HTMLDivElement>(null);
+  const startThumbRef = useRef<HTMLDivElement>(null);
+  const endThumbRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (fixedValues) {
@@ -31,6 +33,8 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
   useEffect(() => {
     const moveThumb = (event: MouseEvent) => {
       if (!rangeRef.current) return;
+      if (isDragging.start && startThumbRef.current) startThumbRef.current.style.cursor = 'grabbing';
+      if (isDragging.end && endThumbRef.current) endThumbRef.current.style.cursor = 'grabbing';
 
       const { clientX } = event;
       const { left, width } = rangeRef.current.getBoundingClientRect();
@@ -72,12 +76,20 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
 
     if (isDragging.start || isDragging.end) {
       window.addEventListener('mousemove', moveThumb);
-      window.addEventListener('mouseup', () => setIsDragging({ start: false, end: false }));
+      window.addEventListener('mouseup', () => {
+        if (isDragging.start && startThumbRef.current) startThumbRef.current.style.cursor = 'grab';
+        if (isDragging.end && endThumbRef.current) endThumbRef.current.style.cursor = 'grab';
+        setIsDragging({ start: false, end: false })
+      });
     }
 
     return () => {
       window.removeEventListener('mousemove', moveThumb);
-      window.removeEventListener('mouseup', () => setIsDragging({ start: false, end: false }));
+      window.addEventListener('mouseup', () => {
+        if (isDragging.start && startThumbRef.current) startThumbRef.current.style.cursor = 'grab';
+        if (isDragging.end && endThumbRef.current) endThumbRef.current.style.cursor = 'grab';
+        setIsDragging({ start: false, end: false })
+      });
     };
   }, [isDragging, min, max, range]);
 
@@ -121,6 +133,7 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
           }}
           onMouseDown={startDragging('start')}
           data-testid="start-thumb"
+          ref={startThumbRef}
         />
         <div
           className='absolute top-1/2 h-3 w-3 cursor-grab rounded-full -translate-x-1/2 -translate-y-1/2 bg-black hover:scale-110'
@@ -128,6 +141,7 @@ export const Range = ({ min, max, fixedValues }: RangeSliderProps) => {
             left: `${((range.end - rangeBoundary.min) / (rangeBoundary.max - rangeBoundary.min)) * 100}%`,
           }}
           onMouseDown={startDragging('end')}
+          ref={endThumbRef}
           data-testid="end-thumb"
         />
       </div>
