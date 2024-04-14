@@ -1,5 +1,4 @@
 
-````markdown
 # Mango - Aitor Ibarra
 
 ## Getting Started
@@ -16,7 +15,6 @@ Ensure you have npm installed on your machine. To install npm, follow the instru
    ```sh
    git clone  https://github.com/aitor-i/aitor-ibarra-mango.git
    ```
-````
 
 2. Install NPM packages
    ```sh
