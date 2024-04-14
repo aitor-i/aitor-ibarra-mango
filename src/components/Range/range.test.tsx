@@ -37,6 +37,18 @@ describe('Range Component', () => {
         consoleSpy.mockRestore();
     });
 
+    test('throws an error when there is min, max and fixed values', () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        expect(() => {
+            render(<Range min={10} max={100} fixedValues={[1, 2, 3]} />);
+        }).toThrow("Invalid props, you can't set fixed values and max or min values!");
+
+        expect(consoleSpy).toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+    });
+
     test('allows input to change range values without crossing', () => {
         render(<Range min={0} max={100} />);
         const startInput = screen.getByDisplayValue('0.00€');
