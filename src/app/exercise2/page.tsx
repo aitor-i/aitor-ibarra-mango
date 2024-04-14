@@ -5,6 +5,16 @@ interface Ranges {
     rangeValues: number[];
 }
 
+export async function generateMetadata() {
+    const endpoint = new URL(process.env.NEXT_PUBLIC_BASE_URL + '/api/get-fixed-range');
+    const res = await fetch(endpoint);
+
+    const data: Ranges = res.ok ? await res.json() : {};
+    return {
+        title: `Range - ${Math.min(...data.rangeValues)} - ${Math.max(...data.rangeValues)}`
+    };
+}
+
 export default async function page() {
     const endpoint = new URL(process.env.NEXT_PUBLIC_BASE_URL + '/api/get-fixed-range');
     const res = await fetch(endpoint);

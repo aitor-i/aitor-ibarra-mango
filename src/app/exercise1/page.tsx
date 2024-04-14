@@ -6,6 +6,16 @@ interface Ranges {
     max: number;
 }
 
+export async function generateMetadata() {
+    const endpoint = new URL(process.env.NEXT_PUBLIC_BASE_URL + '/api/get-range');
+    const res = await fetch(endpoint);
+
+    const data: Ranges = res.ok ? await res.json() : {};
+    return {
+        title: `Range - ${data.min} - ${data.max}`
+    };
+}
+
 export default async function page() {
     const endpoint = new URL(process.env.NEXT_PUBLIC_BASE_URL + '/api/get-range');
     const res = await fetch(endpoint);
