@@ -13,6 +13,18 @@ describe('Range Component', () => {
         expect(endInput).toBeInTheDocument();
     });
 
+    test('throws an error when there is max but not min', () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        expect(() => {
+            render(<Range max={100} />);
+        }).toThrow('No max and min or fixed values found!');
+
+        expect(consoleSpy).toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+    });
+
     test('allows input to change range values without crossing', () => {
         render(<Range min={0} max={100} />);
         const startInput = screen.getByDisplayValue('0.00€');
